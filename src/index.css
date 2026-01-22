@@ -69,3 +69,11 @@ body {
   border: none;
   background: #4fc3f7;
 }
+.animal {
+  font-size: 40px;
+}
+
+p {
+  font-size: 18px;
+  font-weight: bold;
+}
