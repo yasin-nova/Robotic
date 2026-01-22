@@ -3,5 +3,5 @@ import react from '@vitejs/plugin-react'
 
 export default defineConfig({
   plugins: [react()],
-  base: './' // ⚡ Bu çok önemli, deploy sonrası 404 engeller
+  base: './'  // ⚡ Bu, Vercel’de SPA için zorunlu
 })
