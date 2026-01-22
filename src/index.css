@@ -1,0 +1,39 @@
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #e6f7ff;
+}
+
+.app {
+  text-align: center;
+  padding: 10px;
+}
+
+.board {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  margin-top: 30px;
+}
+
+.robot {
+  font-size: 60px;
+}
+
+.habitat {
+  width: 110px;
+  height: 110px;
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+}
+
+.ice {
+  background: #dff3ff;
+}
+
+.sea {
+  background: #b3e5fc;
+}
