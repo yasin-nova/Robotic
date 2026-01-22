@@ -1,14 +1,22 @@
 import { useState } from "react"
+import { levels } from "../data/levels"
 import Robot from "./Robot"
 import Habitat from "./Habitat"
 import Animal from "./Animal"
 
 export default function Board() {
-  const [position, setPosition] = useState({ x: 1, y: 2 })
-  const [hasAnimal, setHasAnimal] = useState(false)
-  const [message, setMessage] = useState("Hayvanı al ve doğru alana götür")
+  const [levelIndex, setLevelIndex] = useState(0)
+  const level = levels[levelIndex]
 
-  const animalPosition = { x: 1, y: 1 }
+  const [position, setPosition] = useState(level.startPosition)
+  const [hasAnimal, setHasAnimal] = useState(false)
+  const [message, setMessage] = useState(level.message)
+
+  const resetLevel = () => {
+    setPosition(level.startPosition)
+    setHasAnimal(false)
+    setMessage(level.message)
+  }
 
   const move = (dx, dy) => {
     const newPos = { x: position.x + dx, y: position.y + dy }
@@ -17,25 +25,38 @@ export default function Board() {
     setPosition(newPos)
 
     if (
-      newPos.x === animalPosition.x &&
-      newPos.y === animalPosition.y &&
-      !hasAnimal
+      !hasAnimal &&
+      newPos.x === level.animalPosition.x &&
+      newPos.y === level.animalPosition.y
     ) {
       setHasAnimal(true)
-      setMessage("Harika! Şimdi doğru yaşam alanına götür")
+      setMessage("Aldın! Şimdi doğru alana götür")
     }
 
-    if (hasAnimal && newPos.x === 0 && newPos.y === 1) {
-      setMessage("⭐ Doğru! Buz alanı")
-    }
+    if (hasAnimal) {
+      if (
+        level.correctHabitat === "ice" &&
+        newPos.x === 0 && newPos.y === 1
+      ) {
+        setMessage("⭐ Harika! Seviye tamamlandı")
+      }
 
-    if (hasAnimal && newPos.x === 2 && newPos.y === 1) {
-      setMessage("❌ Yanlış! Bu deniz alanı")
+      if (
+        level.correctHabitat === "sea" &&
+        newPos.x === 2 && newPos.y === 1
+      ) {
+        setMessage("⭐ Harika! Seviye tamamlandı")
+      }
     }
+  }
+
+  const nextLevel = () => {
+    setLevelIndex(i => (i + 1) % levels.length)
   }
 
   return (
     <>
+      <h3>Seviye {level.id}</h3>
       <p>{message}</p>
 
       <div className="grid">
@@ -44,7 +65,11 @@ export default function Board() {
             {[0,1,2].map(x =>
               <div className="cell" key={x}>
                 {position.x === x && position.y === y && <Robot />}
-                {!hasAnimal && x === 1 && y === 1 && <Animal type="polar" />}
+                {!hasAnimal &&
+                  x === level.animalPosition.x &&
+                  y === level.animalPosition.y &&
+                  <Animal type={level.animal} />
+                }
                 {x === 0 && y === 1 && <Habitat type="ice" label="Buz" />}
                 {x === 2 && y === 1 && <Habitat type="sea" label="Deniz" />}
               </div>
@@ -58,6 +83,10 @@ export default function Board() {
         <button onClick={() => move(0,-1)}>⬆️</button>
         <button onClick={() => move(1,0)}>➡️</button>
       </div>
+
+      <button onClick={nextLevel} style={{ marginTop: 10 }}>
+        ➡️ Sonraki Seviye
+      </button>
     </>
   )
 }
