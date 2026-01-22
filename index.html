@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Robotik Kodlama – Anaokulu</title>
+
+<style>
+  body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #eaf6ff;
+    display: flex;
+    justify-content: center;
+  }
+
+  .app {
+    width: 100%;
+    max-width: 420px;
+    padding: 10px;
+  }
+
+  /* OYUN ALANI */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    grid-template-rows: repeat(6, 1fr);
+    gap: 2px;
+    background: #bcdff5;
+    padding: 4px;
+    border-radius: 12px;
+  }
+
+  .cell {
+    background: #ffffff;
+    border-radius: 8px;
+    aspect-ratio: 1 / 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px;
+  }
+
+  .sea { background: #cfe9f6; }
+  .ice { background: #dde3ea; }
+
+  /* KONTROLLER */
+  .controls {
+    margin-top: 12px;
+    display: flex;
+    justify-content: space-around;
+  }
+
+  button {
+    font-size: 22px;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 14px;
+    cursor: pointer;
+  }
+
+  .cmd { background: #ffffff; }
+  .start { background: #6bcf8e; color: #fff; }
+  .reset { background: #f0b429; color: #fff; }
+
+  .queue {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin: 10px 0;
+    min-height: 40px;
+  }
+
+  .queue span {
+    font-size: 22px;
+  }
+</style>
+</head>
+
+<body>
+<div class="app">
+
+  <!-- OYUN ALANI -->
+  <div class="grid" id="grid"></div>
+
+  <!-- KOMUT SIRASI -->
+  <div class="queue" id="queue"></div>
+
+  <!-- KOMUT BUTONLARI -->
+  <div class="controls">
+    <button class="cmd" onclick="addCmd('F')">⬆️</button>
+    <button class="cmd" onclick="addCmd('L')">⬅️</button>
+    <button class="cmd" onclick="addCmd('R')">➡️</button>
+  </div>
+
+  <!-- KONTROL -->
+  <div class="controls">
+    <button class="start" onclick="run()">▶️</button>
+    <button class="reset" onclick="resetGame()">🔄</button>
+  </div>
+
+</div>
+
+<script>
+  const size = 6;
+  const gridEl = document.getElementById("grid");
+  const queueEl = document.getElementById("queue");
+
+  let robot, target, commands = [];
+
+  function init() {
+    robot = { x: 0, y: 0, dir: "E" };
+    target = { x: 4, y: 3 };
+    commands = [];
+    draw();
+  }
+
+  function draw() {
+    gridEl.innerHTML = "";
+    for (let y = 0; y < size; y++) {
+      for (let x = 0; x < size; x++) {
+        const cell = document.createElement("div");
+        cell.className = "cell";
+
+        if (y > 3) cell.classList.add("sea");
+        if (x > 3 && y < 3) cell.classList.add("ice");
+
+        if (robot.x === x && robot.y === y) {
+          cell.textContent = "🤖";
+        } else if (target.x === x && target.y === y) {
+          cell.textContent = "🐾";
+        }
+
+        gridEl.appendChild(cell);
+      }
+    }
+
+    queueEl.innerHTML = commands.map(c =>
+      c === "F" ? "⬆️" : c === "L" ? "⬅️" : "➡️"
+    ).join("");
+  }
+
+  function addCmd(cmd) {
+    if (commands.length < 6) {
+      commands.push(cmd);
+      draw();
+    }
+  }
+
+  function run() {
+    let i = 0;
+    const interval = setInterval(() => {
+      if (i >= commands.length) {
+        clearInterval(interval);
+        checkWin();
+        return;
+      }
+      step(commands[i]);
+      i++;
+      draw();
+    }, 600);
+  }
+
+  function step(cmd) {
+    if (cmd === "L") rotate(-1);
+    if (cmd === "R") rotate(1);
+    if (cmd === "F") move();
+  }
+
+  function rotate(dir) {
+    const dirs = ["N","E","S","W"];
+    let i = dirs.indexOf(robot.dir);
+    robot.dir = dirs[(i + dir + 4) % 4];
+  }
+
+  function move() {
+    if (robot.dir === "N" && robot.y > 0) robot.y--;
+    if (robot.dir === "S" && robot.y < size-1) robot.y++;
+    if (robot.dir === "E" && robot.x < size-1) robot.x++;
+    if (robot.dir === "W" && robot.x > 0) robot.x--;
+  }
+
+  function checkWin() {
+    if (robot.x === target.x && robot.y === target.y) {
+      alert("🎉 Aferin!");
+    }
+  }
+
+  function resetGame() {
+    init();
+  }
+
+  init();
+</script>
+</body>
+</html>
